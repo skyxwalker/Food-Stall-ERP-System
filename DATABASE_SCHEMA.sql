@@ -13,7 +13,7 @@ CREATE TABLE users (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   username VARCHAR(50) UNIQUE NOT NULL,
   password VARCHAR(255) NOT NULL,
-  role VARCHAR(20) NOT NULL CHECK (role IN ('admin', 'employee')),
+  role VARCHAR(20) NOT NULL CHECK (role IN ('admin', 'employee', 'server')),
   employee_code VARCHAR(50),
   confirmation_mode VARCHAR(20) DEFAULT 'manual' CHECK (confirmation_mode IN ('manual', 'auto')),
   created_at TIMESTAMPTZ DEFAULT NOW(),
@@ -26,7 +26,8 @@ INSERT INTO users (username, password, role, employee_code, confirmation_mode) V
   ('emp1', 'emp1', 'employee', 'emp1', 'manual'),
   ('emp2', 'emp2', 'employee', 'emp2', 'manual'),
   ('emp3', 'emp3', 'employee', 'emp3', 'manual'),
-  ('emp4', 'emp4', 'employee', 'emp4', 'auto');
+  ('emp4', 'emp4', 'employee', 'emp4', 'auto'),
+  ('server1', 'server1', 'server', 'srv1', 'manual');
 
 -- =====================================================
 -- 2. ITEMS TABLE

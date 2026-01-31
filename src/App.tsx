@@ -10,6 +10,7 @@ import { Loader2 } from "lucide-react";
 import Login from "@/pages/Login";
 import AdminLayout from "@/components/layout/AdminLayout";
 import EmployeeLayout from "@/components/layout/EmployeeLayout";
+import ServerLayout from "@/components/layout/ServerLayout";
 import Dashboard from "@/pages/admin/Dashboard";
 import Items from "@/pages/admin/Items";
 import Employees from "@/pages/admin/Employees";
@@ -17,6 +18,7 @@ import POS from "@/pages/admin/POS";
 import Costs from "@/pages/admin/Costs";
 import Reports from "@/pages/admin/Reports";
 import TaskDashboard from "@/pages/employee/TaskDashboard";
+import ServerDashboard from "@/pages/server/ServerDashboard";
 import NotFound from "@/pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -32,7 +34,7 @@ function LoadingScreen() {
   );
 }
 
-function ProtectedRoute({ children, requiredRole }: { children: React.ReactNode; requiredRole?: 'admin' | 'employee' }) {
+function ProtectedRoute({ children, requiredRole }: { children: React.ReactNode; requiredRole?: 'admin' | 'employee' | 'server' }) {
   const { user, isLoading: authLoading } = useAuth();
   const { isLoading: dataLoading } = useData();
   
@@ -45,7 +47,11 @@ function ProtectedRoute({ children, requiredRole }: { children: React.ReactNode;
   }
   
   if (requiredRole && user.role !== requiredRole) {
-    return <Navigate to={user.role === 'admin' ? '/admin' : '/employee'} replace />;
+    return <Navigate to={
+      user.role === 'admin' ? '/admin' :
+      user.role === 'employee' ? '/employee' :
+      '/server'
+    } replace />;
   }
   
   return <>{children}</>;
@@ -60,7 +66,11 @@ function AppRoutes() {
 
   return (
     <Routes>
-      <Route path="/login" element={user ? <Navigate to={user.role === 'admin' ? '/admin' : '/employee'} replace /> : <Login />} />
+      <Route path="/login" element={user ? <Navigate to={
+        user.role === 'admin' ? '/admin' :
+        user.role === 'employee' ? '/employee' :
+        '/server'
+      } replace /> : <Login />} />
       
       {/* Admin routes */}
       <Route path="/admin" element={<ProtectedRoute requiredRole="admin"><AdminLayout><Dashboard /></AdminLayout></ProtectedRoute>} />
@@ -72,6 +82,9 @@ function AppRoutes() {
       
       {/* Employee routes */}
       <Route path="/employee" element={<ProtectedRoute requiredRole="employee"><EmployeeLayout><TaskDashboard /></EmployeeLayout></ProtectedRoute>} />
+      
+      {/* Server routes */}
+      <Route path="/server" element={<ProtectedRoute requiredRole="server"><ServerLayout><ServerDashboard /></ServerLayout></ProtectedRoute>} />
       
       {/* Redirects */}
       <Route path="/" element={<Navigate to="/login" replace />} />

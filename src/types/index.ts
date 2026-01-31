@@ -1,5 +1,5 @@
 // User types
-export type UserRole = 'admin' | 'employee';
+export type UserRole = 'admin' | 'employee' | 'server';
 export type ConfirmationMode = 'manual' | 'auto';
 
 export interface User {
