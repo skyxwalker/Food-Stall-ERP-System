@@ -102,6 +102,6 @@ export function downloadFoodStallReportPdf(params: {
   drawCard(400, 'Profit / Loss', `${Math.round(totalProfitOrLoss).toLocaleString()}`);
 
   // ---------- Save ----------
-  const fileName = `food-stall-report_${reportDate.replaceAll('/', '-')}.pdf`;
+  const fileName = `food-stall-report_${reportDate.replace(/\//g, '-')}.pdf`;
   doc.save(fileName);
 }

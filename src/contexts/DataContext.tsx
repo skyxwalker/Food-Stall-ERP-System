@@ -12,7 +12,7 @@ interface DataContextType {
   
   // Sales
   sales: Sale[];
-  addSale: (sale: Omit<Sale, 'id'>) => Promise<void>;
+  addSale: (sale: Omit<Sale, 'id'>) => Promise<Sale | null>;
   updateSaleItemStatus: (saleId: string, itemId: string) => Promise<void>;
   updateSalePaymentMethod: (saleId: string, paymentMethod: PaymentMethod) => Promise<void>;
   refreshSales: () => Promise<void>;
@@ -103,8 +103,9 @@ export function DataProvider({ children }: { children: ReactNode }) {
   };
 
   const addSale = async (saleData: Omit<Sale, 'id'>) => {
-    await supabaseStorage.addSale(saleData);
+    const addedSale = await supabaseStorage.addSale(saleData);
     await Promise.all([refreshItems(), refreshSales(), refreshStockLogs()]);
+    return addedSale;
   };
 
   const updateSaleItemStatus = async (saleId: string, itemId: string) => {

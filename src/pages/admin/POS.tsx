@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useData } from '@/contexts/DataContext';
-import { PaymentMethod, Employee } from '@/types';
+import { PaymentMethod, Employee, Sale } from '@/types';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -30,6 +30,8 @@ export default function POS() {
   const { items, cart, addToCart, updateCartQty, removeFromCart, clearCart, cartTotal, cartCost, addSale } = useData();
   const [checkoutOpen, setCheckoutOpen] = useState(false);
   const [confirmOpen, setConfirmOpen] = useState(false);
+  const [successOpen, setSuccessOpen] = useState(false);
+  const [completedSale, setCompletedSale] = useState<Sale | null>(null);
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('cash');
   const [creditCustomer, setCreditCustomer] = useState('');
   const [employees, setEmployees] = useState<Employee[]>([]);
@@ -90,14 +92,15 @@ export default function POS() {
         creditCustomerName: paymentMethod === 'credit' ? creditCustomer.trim() : null,
       };
 
-      await addSale(sale);
+      const addedSale = await addSale(sale);
+      if (addedSale) {
+        setCompletedSale(addedSale);
+        setSuccessOpen(true);
+      }
       clearCart();
       setConfirmOpen(false);
       setPaymentMethod('cash');
       setCreditCustomer('');
-      toast.success('Sale completed!', {
-        description: `Order total: ₹${cartTotal}`,
-      });
     } finally {
       setIsSubmitting(false);
     }
@@ -383,6 +386,40 @@ export default function POS() {
                 {isSubmitting ? 'Processing...' : 'Confirm Sale'}
               </Button>
             </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Success Modal */}
+      <Dialog open={successOpen} onOpenChange={setSuccessOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-center text-green-600">Successfully Submitted!</DialogTitle>
+          </DialogHeader>
+          
+          <div className="space-y-6">
+            {/* Token Number in big square */}
+            <div className="flex justify-center">
+              <div className="w-32 h-32 bg-primary text-primary-foreground rounded-lg flex items-center justify-center text-4xl font-bold shadow-lg">
+                {completedSale?.tokenNumber}
+              </div>
+            </div>
+
+            {/* Order Items */}
+            <div className="border rounded-lg p-4 space-y-2">
+              <p className="text-sm font-medium text-muted-foreground">Ordered Items</p>
+              {completedSale?.items.map((item, index) => (
+                <div key={index} className="flex justify-between text-sm">
+                  <span>{item.itemName} × {item.qty}</span>
+                  <span className="font-medium">₹{item.price * item.qty}</span>
+                </div>
+              ))}
+            </div>
+
+            {/* Close Button */}
+            <Button className="w-full" onClick={() => setSuccessOpen(false)}>
+              Close
+            </Button>
           </div>
         </DialogContent>
       </Dialog>
