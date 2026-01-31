@@ -1,1 +1,0 @@
-# Food-Stall-ERP-System
